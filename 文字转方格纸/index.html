@@ -9,36 +9,36 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px 0; /* 只保留上下的间距 */
+      padding: 20px 0;
       display: flex;
     }
 
     .container {
       display: flex;
-      margin: 0 auto; /* 保持水平居中 */
+      margin: 0 auto;
     }
 
     textarea {
       width: 300px;
       height: 500px;
-      margin-right: 0; /* 去掉右侧间距 */
+      margin-right: 0;
       font-size: 16px;
       margin: 0 10px 0 0;
     }
 
     .grid-container {
       display: flex;
-      align-items: stretch; /* 确保对齐 */
+      align-items: stretch;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(20, 1fr);
       grid-template-rows: repeat(50, 1fr);
-      gap: 2px 0; /* 只有上下有间距，左右无间距 */
+      gap: 2px 0;
       height: 500px;
       width: 650px;
-      border-collapse: collapse; /* 防止边框重叠 */
+      border-collapse: collapse;
     }
 
     .cell {
@@ -54,13 +54,13 @@
       display: grid;
       grid-template-rows: repeat(50, 1fr);
       height: 500px;
-      width: 60px; /* 调整宽度以容纳数字和括号 */
+      width: 60px;
       text-align: center;
-      border-left: 1px solid red; /* 添加左边框以匹配网格 */
+      border-left: 1px solid red;
     }
 
     .line-number div {
-      line-height: 34px; /* 调整行号的垂直对齐 */
+      line-height: 34px;
     }
   </style>
 </head>
@@ -74,6 +74,15 @@
     </div>
   </div>
   <script>
+    // 在页面加载时检查本地存储
+    window.onload = function() {
+      const savedInput = localStorage.getItem('gridInput'); // 获取存储的输入内容
+      if (savedInput) {
+        document.getElementById('input').value = savedInput; // 恢复输入框的内容
+        updateGrid(); // 更新网格显示
+      }
+    };
+
     function updateGrid() {
       const input = document.getElementById("input").value;
       const grid = document.getElementById("grid");
@@ -92,30 +101,31 @@
 
       // 填充方格和行号
       for (let i = 0; i < 50; i++) {
-        // 添加行号和后面的括号数字
         const lineNumberDiv = document.createElement("div");
-        const lineNumber = i + 1; // 行号从1开始
-        let additionalNumber = ""; // 默认没有数字
-
+        const lineNumber = i + 1;
+        let additionalNumber = "";
+        
         // 只有5的倍数才显示数字
         if (lineNumber % 5 === 0) {
-          additionalNumber = `${lineNumber * 20}(${lineNumber * 20})`; // 5对应100, 10对应200
+          additionalNumber = `${lineNumber * 20}(${lineNumber * 20})`;
         }
-        lineNumberDiv.textContent = `${lineNumber}${additionalNumber ? `(${lineNumber * 20})` : ''}`; // 例如: 5(100)
+        lineNumberDiv.textContent = `${lineNumber}${additionalNumber ? `(${lineNumber * 20})` : ''}`;
         lineNumbers.appendChild(lineNumberDiv);
 
         if (i < lines.length) {
-          const currentLine = lines[i]; // 当前行
+          const currentLine = lines[i];
           for (let j = 0; j < 20; j++) {
-            grid.appendChild(createCell(currentLine[j] || "")); // 填充字符或空格
+            grid.appendChild(createCell(currentLine[j] || ""));
           }
         } else {
-          // 填充空行
           for (let j = 0; j < 20; j++) {
-            grid.appendChild(createCell("")); // 填充空格
+            grid.appendChild(createCell(""));
           }
         }
       }
+
+      // 自动保存输入内容到本地存储
+      localStorage.setItem('gridInput', input);
     }
 
     function handleEnterKey(event) {
@@ -124,9 +134,9 @@
         const cursorPosition = input.selectionStart;
         const textBeforeCursor = input.value.slice(0, cursorPosition);
         const textAfterCursor = input.value.slice(cursorPosition);
-        input.value = textBeforeCursor + '\n' + '  ' + textAfterCursor; // 手动添加换行
+        input.value = textBeforeCursor + '\n' + '  ' + textAfterCursor;
         updateGrid(); // 更新网格
-        event.preventDefault(); // 阻止默认的换行行为
+        event.preventDefault();
       }
     }
 
