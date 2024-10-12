@@ -11,6 +11,7 @@
       margin: 0;
       padding: 20px 0;
       display: flex;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .container {
@@ -22,6 +23,7 @@
       width: 100%;
       height: 500px;
       font-size: 16px;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .grid-container {
@@ -32,14 +34,11 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(20, 32px);
-      /* 列宽固定为32px */
       grid-template-rows: repeat(50, 1fr);
       gap: 2px 0;
-      height: 95vh;
+      height: 100%;
       width: auto;
-      /* 宽度自动适应内容 */
       overflow-x: auto;
-      /* 添加水平滚动条 */
       border-collapse: collapse;
     }
 
@@ -68,12 +67,45 @@
     .settings {
       margin-bottom: 10px;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start; /* 修改为左对齐 */
+      flex-wrap: wrap; /* 允许换行 */
+      align-items: center;
     }
 
     .left-box {
       margin-right: 20px;
-      width: 400px;
+      width: 500px; /* 增加宽度 */
+    }
+
+    .button {
+      padding: 8px 12px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      font-size: 14px;
+    }
+
+    .button:hover {
+      background-color: #0056b3;
+    }
+
+    .dark-mode {
+      background-color: #333;
+      color: white;
+    }
+
+    .dark-mode textarea {
+      background-color: #444;
+      color: white;
+    }
+
+    .dark-mode input {
+      background-color: #444;
+      color: white;
     }
   </style>
 </head>
@@ -86,8 +118,9 @@
         <input style="width: 50px;" type="number" id="rows" value="50" min="1">
         <label for="columns">列数: </label>
         <input style="width: 50px;" type="number" id="columns" value="20" min="1">
-        <button class="marginlr" onclick="updateGridDimensions()">更新网格</button>
-        <button onclick="exportToFile()">导出文本</button> <!-- 添加导出按钮 -->
+        <button class="button" onclick="updateGridDimensions()">更新网格</button>
+        <button class="button" onclick="exportToFile()">导出文本</button>
+        <button class="button" onclick="toggleDarkMode()">切换主题</button>
       </div>
       <textarea id="input" placeholder="输入你的文字" oninput="updateGrid()"></textarea>
     </div>
@@ -103,17 +136,21 @@
         document.getElementById('input').value = savedInput;
         updateGrid();
       }
+
+      const darkMode = localStorage.getItem('darkMode') === 'true';
+      if (darkMode) {
+        document.body.classList.add('dark-mode');
+      }
     };
 
-    let rows = 50; // 默认行数
-    let columns = 20; // 默认列数
+    let rows = 50;
+    let columns = 20;
 
     function updateGridDimensions() {
       rows = parseInt(document.getElementById('rows').value) || 50;
       columns = parseInt(document.getElementById('columns').value) || 20;
 
-      // 更新网格的列样式
-      document.getElementById('grid').style.gridTemplateColumns = `repeat(${columns}, 32px)`; // 列宽固定为32px
+      document.getElementById('grid').style.gridTemplateColumns = `repeat(${columns}, 32px)`;
       updateGrid();
     }
 
@@ -182,14 +219,19 @@
 
     function exportToFile() {
       const input = document.getElementById("input").value;
-      const date = new Date().toISOString().split('T')[0]; // 获取当前日期
-      const fileName = `作文_${date}.txt`; // 设置文件名
+      const date = new Date().toISOString().split('T')[0];
+      const fileName = `作文_${date}.txt`;
 
       const blob = new Blob([input], { type: 'text/plain' });
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      link.download = fileName; // 使用自定义文件名
-      link.click(); // 模拟点击下载
+      link.download = fileName;
+      link.click();
+    }
+
+    function toggleDarkMode() {
+      const isDarkMode = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', isDarkMode);
     }
   </script>
 </body>
