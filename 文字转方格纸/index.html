@@ -29,6 +29,8 @@
     .grid-container {
       display: flex;
       align-items: stretch;
+      height: 95vh;
+      overflow: auto;
     }
 
     .grid {
@@ -38,7 +40,6 @@
       gap: 2px 0;
       height: 100%;
       width: auto;
-      overflow-x: auto;
       border-collapse: collapse;
     }
 
@@ -57,7 +58,6 @@
       height: 500px;
       width: 60px;
       text-align: center;
-      border-left: 1px solid red;
     }
 
     .line-number div {
@@ -67,14 +67,14 @@
     .settings {
       margin-bottom: 10px;
       display: flex;
-      justify-content: flex-start; /* 修改为左对齐 */
-      flex-wrap: wrap; /* 允许换行 */
+      justify-content: flex-start;
+      flex-wrap: wrap;
       align-items: center;
     }
 
     .left-box {
       margin-right: 20px;
-      width: 500px; /* 增加宽度 */
+      width: 530px;
     }
 
     .button {
@@ -121,8 +121,9 @@
         <button class="button" onclick="updateGridDimensions()">更新网格</button>
         <button class="button" onclick="exportToFile()">导出文本</button>
         <button class="button" onclick="toggleDarkMode()">切换主题</button>
+        <button class="button" onclick="clearContent()">清空</button> <!-- 添加清空按钮 -->
       </div>
-      <textarea id="input" placeholder="输入你的文字" oninput="updateGrid()"></textarea>
+      <textarea id="input" placeholder="输入你的文本" oninput="updateGrid()"></textarea>
     </div>
     <div class="grid-container">
       <div id="grid" class="grid"></div>
@@ -131,6 +132,7 @@
   </div>
   <script>
     window.onload = function () {
+      // 页面加载时恢复输入内容和主题
       const savedInput = localStorage.getItem('gridInput');
       if (savedInput) {
         document.getElementById('input').value = savedInput;
@@ -147,14 +149,15 @@
     let columns = 20;
 
     function updateGridDimensions() {
+      // 更新网格的行数和列数
       rows = parseInt(document.getElementById('rows').value) || 50;
       columns = parseInt(document.getElementById('columns').value) || 20;
-
       document.getElementById('grid').style.gridTemplateColumns = `repeat(${columns}, 32px)`;
       updateGrid();
     }
 
     function updateGrid() {
+      // 更新网格显示内容
       const input = document.getElementById("input").value;
       const grid = document.getElementById("grid");
       const lineNumbers = document.getElementById("lineNumbers");
@@ -192,10 +195,17 @@
         }
       }
 
+      // 如果没有输入内容，则清空网格
+      if (!input.trim()) {
+        grid.innerHTML = "";
+        lineNumbers.innerHTML = "";
+      }
+
       localStorage.setItem('gridInput', input);
     }
 
     function handleEnterKey(event) {
+      // 处理输入框中的换行
       if (event.key === "Enter") {
         const input = document.getElementById("input");
         const cursorPosition = input.selectionStart;
@@ -211,6 +221,7 @@
     document.getElementById("input").addEventListener("keydown", handleEnterKey);
 
     function createCell(content) {
+      // 创建网格单元格
       const div = document.createElement("div");
       div.className = "cell";
       div.textContent = content;
@@ -218,6 +229,7 @@
     }
 
     function exportToFile() {
+      // 导出文本文件
       const input = document.getElementById("input").value;
       const date = new Date().toISOString().split('T')[0];
       const fileName = `作文_${date}.txt`;
@@ -230,8 +242,18 @@
     }
 
     function toggleDarkMode() {
+      // 切换深色模式
       const isDarkMode = document.body.classList.toggle('dark-mode');
       localStorage.setItem('darkMode', isDarkMode);
+    }
+
+    function clearContent() {
+      // 清空输入框和网格
+      document.getElementById("input").value = ""; // 清空输入框内容
+      updateGrid(); // 更新网格
+      localStorage.removeItem('gridInput'); // 清除本地存储
+      document.getElementById("lineNumbers").innerHTML = ""; // 清空行号
+      document.getElementById("grid").innerHTML = ""; // 清空网格
     }
   </script>
 </body>
