@@ -19,11 +19,9 @@
     }
 
     textarea {
-      width: 300px;
+      width: 100%;
       height: 500px;
-      margin-right: 0;
       font-size: 16px;
-      margin: 0 10px 0 0;
     }
 
     .grid-container {
@@ -33,11 +31,15 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(20, 1fr);
+      grid-template-columns: repeat(20, 32px);
+      /* 列宽固定为32px */
       grid-template-rows: repeat(50, 1fr);
       gap: 2px 0;
-      height: 500px;
-      width: 650px;
+      height: 95vh;
+      width: auto;
+      /* 宽度自动适应内容 */
+      overflow-x: auto;
+      /* 添加水平滚动条 */
       border-collapse: collapse;
     }
 
@@ -62,50 +64,80 @@
     .line-number div {
       line-height: 34px;
     }
+
+    .settings {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      
+    }
+
+    .left-box {
+      margin-right: 20px;
+      width: 400px;
+
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <textarea id="input" placeholder="输入你的文字" oninput="updateGrid()"></textarea>
+    <div class="left-box">
+      <div class="settings">
+        <label for="rows">行数: </label>
+        <input style="width: 50px;" type="number" id="rows" value="50" min="1">
+        <label for="columns">列数: </label>
+        <input style="width: 50px;" type="number" id="columns" value="20" min="1">
+        <button class="marginlr" onclick="updateGridDimensions()">更新网格</button>
+      </div>
+      <textarea id="input" placeholder="输入你的文字" oninput="updateGrid()"></textarea>
+    </div>
     <div class="grid-container">
       <div id="grid" class="grid"></div>
       <div class="line-number" id="lineNumbers"></div>
     </div>
   </div>
   <script>
-    // 在页面加载时检查本地存储
-    window.onload = function() {
-      const savedInput = localStorage.getItem('gridInput'); // 获取存储的输入内容
+    window.onload = function () {
+      const savedInput = localStorage.getItem('gridInput');
       if (savedInput) {
-        document.getElementById('input').value = savedInput; // 恢复输入框的内容
-        updateGrid(); // 更新网格显示
+        document.getElementById('input').value = savedInput;
+        updateGrid();
       }
     };
+
+    let rows = 50; // 默认行数
+    let columns = 20; // 默认列数
+
+    function updateGridDimensions() {
+      rows = parseInt(document.getElementById('rows').value) || 50;
+      columns = parseInt(document.getElementById('columns').value) || 20;
+
+      // 更新网格的列样式
+      document.getElementById('grid').style.gridTemplateColumns = `repeat(${columns}, 32px)`; // 列宽固定为32px
+      updateGrid();
+    }
 
     function updateGrid() {
       const input = document.getElementById("input").value;
       const grid = document.getElementById("grid");
       const lineNumbers = document.getElementById("lineNumbers");
-      grid.innerHTML = ""; // 清空当前的表格内容
-      lineNumbers.innerHTML = ""; // 清空行号内容
+      grid.innerHTML = "";
+      lineNumbers.innerHTML = "";
 
-      // 将输入的文字按行分割，处理自动换行
       const lines = input.split('\n').flatMap(line => {
         const result = [];
-        for (let i = 0; i < line.length; i += 20) {
-          result.push(line.slice(i, i + 20));
+        for (let i = 0; i < line.length; i += columns) {
+          result.push(line.slice(i, i + columns));
         }
         return result;
       });
 
-      // 填充方格和行号
-      for (let i = 0; i < 50; i++) {
+      for (let i = 0; i < rows; i++) {
         const lineNumberDiv = document.createElement("div");
         const lineNumber = i + 1;
         let additionalNumber = "";
-        
-        // 只有5的倍数才显示数字
+
         if (lineNumber % 5 === 0) {
           additionalNumber = `${lineNumber * 20}(${lineNumber * 20})`;
         }
@@ -114,17 +146,16 @@
 
         if (i < lines.length) {
           const currentLine = lines[i];
-          for (let j = 0; j < 20; j++) {
+          for (let j = 0; j < columns; j++) {
             grid.appendChild(createCell(currentLine[j] || ""));
           }
         } else {
-          for (let j = 0; j < 20; j++) {
+          for (let j = 0; j < columns; j++) {
             grid.appendChild(createCell(""));
           }
         }
       }
 
-      // 自动保存输入内容到本地存储
       localStorage.setItem('gridInput', input);
     }
 
@@ -135,7 +166,7 @@
         const textBeforeCursor = input.value.slice(0, cursorPosition);
         const textAfterCursor = input.value.slice(cursorPosition);
         input.value = textBeforeCursor + '\n' + '  ' + textAfterCursor;
-        updateGrid(); // 更新网格
+        updateGrid();
         event.preventDefault();
       }
     }
