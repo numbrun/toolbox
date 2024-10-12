@@ -69,13 +69,11 @@
       margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
-      
     }
 
     .left-box {
       margin-right: 20px;
       width: 400px;
-
     }
   </style>
 </head>
@@ -89,6 +87,7 @@
         <label for="columns">列数: </label>
         <input style="width: 50px;" type="number" id="columns" value="20" min="1">
         <button class="marginlr" onclick="updateGridDimensions()">更新网格</button>
+        <button onclick="exportToFile()">导出文本</button> <!-- 添加导出按钮 -->
       </div>
       <textarea id="input" placeholder="输入你的文字" oninput="updateGrid()"></textarea>
     </div>
@@ -179,6 +178,18 @@
       div.className = "cell";
       div.textContent = content;
       return div;
+    }
+
+    function exportToFile() {
+      const input = document.getElementById("input").value;
+      const date = new Date().toISOString().split('T')[0]; // 获取当前日期
+      const fileName = `作文_${date}.txt`; // 设置文件名
+
+      const blob = new Blob([input], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = fileName; // 使用自定义文件名
+      link.click(); // 模拟点击下载
     }
   </script>
 </body>
