@@ -9,35 +9,36 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 20px 0; /* 只保留上下的间距 */
       display: flex;
     }
 
     .container {
       display: flex;
-      margin: 0 auto;
+      margin: 0 auto; /* 保持水平居中 */
     }
 
     textarea {
       width: 300px;
       height: 500px;
-      margin-right: 20px;
+      margin-right: 0; /* 去掉右侧间距 */
       font-size: 16px;
+      margin: 0 10px 0 0;
     }
 
     .grid-container {
       display: flex;
-      align-items: stretch;
-      /* 确保对齐 */
+      align-items: stretch; /* 确保对齐 */
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(20, 1fr);
       grid-template-rows: repeat(50, 1fr);
-      gap: 1px;
+      gap: 2px 0; /* 只有上下有间距，左右无间距 */
       height: 500px;
-      width: 600px;
+      width: 650px;
+      border-collapse: collapse; /* 防止边框重叠 */
     }
 
     .cell {
@@ -53,16 +54,13 @@
       display: grid;
       grid-template-rows: repeat(50, 1fr);
       height: 500px;
-      width: 60px;
-      /* 调整宽度以容纳数字和括号 */
+      width: 60px; /* 调整宽度以容纳数字和括号 */
       text-align: center;
-      border-left: 1px solid red;
-      /* 添加左边框以匹配网格 */
+      border-left: 1px solid red; /* 添加左边框以匹配网格 */
     }
 
     .line-number div {
-      line-height: 33px;
-      /* 调整行号的垂直对齐 */
+      line-height: 34px; /* 调整行号的垂直对齐 */
     }
   </style>
 </head>
