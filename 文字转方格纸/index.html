@@ -78,7 +78,7 @@
 
     .left-box {
       margin-right: 20px;
-      width: 530px;
+      width: 550px;
     }
 
     .button {
@@ -119,22 +119,84 @@
     <div class="left-box">
       <div class="settings">
         <label for="rows">行数: </label>
-        <input style="width: 50px;" type="number" id="rows" value="50" min="1">
+        <input style="width: 50px;" type="number" id="rows" value="40" min="1">
         <label for="columns">列数: </label>
         <input style="width: 50px;" type="number" id="columns" value="20" min="1">
         <button class="button" onclick="updateGridDimensions()">更新网格</button>
-        <button class="button" onclick="exportToFile()">导出文本</button>
         <button class="button" onclick="toggleDarkMode()">切换主题</button>
-        <button class="button" onclick="clearContent()">清空</button> <!-- 添加清空按钮 -->
+        <button class="button" onclick="exportToFile()">导出文本</button>
+        <button class="button" onclick="generateImage()">导出图片</button>
       </div>
       <textarea id="input" placeholder="输入你的文本" oninput="updateGrid()"></textarea>
     </div>
-    <div class="grid-container">
+    <div id="" class="grid-container">
       <div id="grid" class="grid"></div>
       <div class="line-number" id="lineNumbers"></div>
     </div>
   </div>
   <script>
+    //导出图片
+    function generateImage() {
+      const grid = document.getElementById('grid');
+      const canvas = document.createElement('canvas');
+
+      const cellSize = 32; // 单元格大小
+      const cols = 20; // 固定列数
+      const rows = Math.ceil(grid.children.length / cols); // 自动计算行数
+
+      const padding = 20; // 设置边距
+      const lineNumberOffset = 40; // 行号偏移量
+      canvas.width = cols * cellSize + padding * 2 + lineNumberOffset; // 加上边距和行号宽度
+      canvas.height = rows * cellSize + padding * 2 + 30; // 增加署名空间
+
+      const ctx = canvas.getContext('2d');
+
+      // 设置字体和样式
+      ctx.font = '16px Arial'; // 表格字体大小
+      ctx.fillStyle = '#333'; // 设置行号颜色
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // 绘制背景
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 绘制署名
+      ctx.font = '14px Arial'; // 署名字体大小
+      ctx.fillStyle = 'black'; // 署名颜色
+      ctx.fillText('该图片由 https://up.iucoder.com/ 生成,祝君上岸!', canvas.width / 2, padding - 10); // 署名位置
+
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const index = i * cols + j;
+          const cellContent = index < grid.children.length ? grid.children[index].textContent : '';
+
+          const x = padding + j * cellSize; // 加上边距
+          const y = padding + i * cellSize + 30; // 加上边距，向下移动以避免重叠
+
+          // 绘制单元格边框
+          ctx.strokeStyle = 'red';
+          ctx.strokeRect(x, y, cellSize, cellSize);
+
+          // 绘制单元格文本
+          ctx.fillStyle = 'black'; // 单元格文本颜色
+          ctx.fillText(cellContent, x + cellSize / 2, y + cellSize / 2);
+        }
+
+        // 绘制右侧行号
+        const lineNumber = i + 1;
+        const additionalText = lineNumber % 5 === 0 ? `(${lineNumber * 20})` : ''; // 每 5 行添加对应文本
+        const lineNumberX = padding + cols * cellSize + 30; // 行号位置，右侧
+        ctx.fillText(`${lineNumber}${additionalText}`, lineNumberX, padding + i * cellSize + cellSize / 2 + 30); // 调整位置
+      }
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      const date = new Date().toISOString().split('T')[0];
+      link.download = `写作_${date}.png`;
+      link.click();
+    }
+
     window.onload = function () {
       // 页面加载时恢复输入内容和主题
       const savedInput = localStorage.getItem('gridInput');
@@ -149,12 +211,12 @@
       }
     };
 
-    let rows = 50;
+    let rows = 40;
     let columns = 20;
 
     function updateGridDimensions() {
       // 更新网格的行数和列数
-      rows = parseInt(document.getElementById('rows').value) || 50;
+      rows = parseInt(document.getElementById('rows').value) || 40;
       columns = parseInt(document.getElementById('columns').value) || 20;
       document.getElementById('grid').style.gridTemplateColumns = `repeat(${columns}, 32px)`;
       updateGrid();
@@ -236,7 +298,7 @@
       // 导出文本文件
       const input = document.getElementById("input").value;
       const date = new Date().toISOString().split('T')[0];
-      const fileName = `作文_${date}.txt`;
+      const fileName = `写作_${date}.txt`;
 
       const blob = new Blob([input], { type: 'text/plain' });
       const link = document.createElement('a');
